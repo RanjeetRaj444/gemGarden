@@ -1,26 +1,17 @@
 import {
   Alert,
   AlertDescription,
-  // AlertDialog,
-  // AlertDialogBody,
-  // AlertDialogContent,
-  // AlertDialogFooter,
-  // AlertDialogHeader,
-  // AlertDialogOverlay,
   AlertIcon,
   AlertTitle,
   Box,
   Button,
   CloseButton,
-  // Wrap,
-  // WrapItem,
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
 import React from "react";
 import { useDispatch } from "react-redux";
-import { addToCartProduct } from "../../Redux/Cart/action";
-// import { addToCartProduct } from "../../Redux/Products/action";
+import { addToCartProduct } from "../Redux/Cart/action";
 
 export function CompExample() {
   const dispatch = useDispatch()
@@ -54,7 +45,6 @@ export function CompExample() {
       />
     </Alert>
   ) : (
-    //   <Button onClick={onOpen}>Show Alert</Button>
     <Button
       className="btn"
       onClick={handleClick}

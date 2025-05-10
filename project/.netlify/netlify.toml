@@ -7,9 +7,10 @@ redirects = []
 [functions."*"]
 
 [build]
-publish = "D:\\Ranjeet\\Project\\Component Design\\dist"
+publish = "D:\\Ranjeet\\Project\\gemGarden\\project\\dist"
 publishOrigin = "ui"
 commandOrigin = "ui"
+base = "D:\\Ranjeet\\Project\\gemGarden\\project"
 command = "npm run build"
 
 [build.environment]

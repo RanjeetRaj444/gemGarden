@@ -1,88 +1,89 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import blackbgEar from "../Assets/black.jpg";
-import "animate.css";
-import { useToast } from "@chakra-ui/react";
 import {
-  Flex,
   Box,
+  Button,
+  Flex,
+  Stack,
+  useColorModeValue,
+  Heading,
   FormControl,
-  FormLabel,
-  Input,
   InputGroup,
   InputRightElement,
-  Stack,
-  Button,
-  Heading,
   Text,
-  useColorModeValue,
+  FormLabel,
+  Input,
+  useToast,
 } from "@chakra-ui/react";
-import { ArrowForwardIcon, ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { login } from "../Redux/Authentication/action";
+import { getAdminlogin } from "../../Redux/Admin/action";
+import { ArrowForwardIcon, ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
+import blackbgEar from "../../Assets/black.jpg";
+import "animate.css";
+import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
-export const Login = () => {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const [showPassword, setShowPassword] = useState(false);
-  const [submissiondisbled, setSubmissiondisbled] = useState(false);
+export const AdminLogin = () => {
   const toast = useToast();
-  const { isAuth, errMsg, token } = useSelector((store) => store.authReducer);
-  const [logindata, setLoginData] = useState({
+  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+  const [adminlogin, setAdminLogin] = useState({
     email: "",
     password: "",
   });
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-
-    if (!logindata.email || !logindata.password) {
-      toast({
-        title: "Failed!!",
-        description: "Please fill all the fields.",
-        status: "error",
-        position: "top",
-        duration: 4000,
-        isClosable: true,
-      });
-      return;
-    }
-
-    dispatch(login(logindata));
-  };
+  const dispatch = useDispatch();
+  const { admindata } = useSelector((store) => store.adminReducer);
 
   useEffect(() => {
-    if (token) {
-      toast({
-        title: "Success",
-        description: "User LoggedIn Successful",
-        status: "success",
-        position: "top",
-        duration: 4000,
-        isClosable: true,
-      });
-      localStorage.setItem("user-token", token);
-      navigate("/");
-      setLoginData({ email: "", password: "" });
-      return;
-    }
-    if (errMsg) {
-      toast({
-        title: "Failed",
-        description: errMsg,
+    dispatch(getAdminlogin());
+  }, []);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!adminlogin.email || !adminlogin.password) {
+      return toast({
+        title: "Login Failed!",
+        description: "Please fill all the inputs",
         status: "error",
-        position: "top",
-        duration: 4000,
+        duration: 3000,
         isClosable: true,
+        position: "top",
       });
-      return;
     }
-  }, [isAuth, token, errMsg]);
+
+    admindata.find((el) => {
+      if (el.email == adminlogin.email) {
+        if (el.password == adminlogin.password) {
+          toast({
+            title: "Success",
+            description: "Admin LoggedIn Successful",
+            status: "success",
+            position: "top",
+            duration: 4000,
+            isClosable: true,
+          });
+          return setTimeout(() => {
+            navigate("/admin");
+          }, 4000);
+        } else {
+          return toast({
+            title: "Wrong Password!",
+            description: "Please enter correct password",
+            status: "error",
+            position: "top",
+            duration: 4000,
+            isClosable: true,
+          });
+        }
+      }
+    });
+  };
 
   return (
     <>
       <Box
+        borderRadius={"0px"}
         position={"relative"}
         style={{
           backgroundImage: `url(${blackbgEar})`,
@@ -90,7 +91,7 @@ export const Login = () => {
         }}
       >
         <form
-          onSubmit={handleLogin}
+          onSubmit={handleSubmit}
           style={{
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
@@ -121,7 +122,7 @@ export const Login = () => {
             >
               <Stack align={"center"}>
                 <Heading color={"white"} fontSize={"4xl"} textAlign={"center"}>
-                  Login
+                  Admin Login
                 </Heading>
               </Stack>
               <Box
@@ -137,16 +138,16 @@ export const Login = () => {
                       borderRight={"none"}
                       borderTop={"none"}
                       focusBorderColor="none"
-                      placeholder={"Your email address"}
+                      placeholder={"Enter email address"}
                       _placeholder={{ opacity: 1, color: "#a0a0a0" }}
                       _focus={{
                         bg: "whiteAlpha.300",
                         borderColor: "#FFB300",
                       }}
                       type="email"
-                      value={logindata.email}
+                      value={adminlogin.email}
                       onChange={(e) =>
-                        setLoginData((prev) => ({
+                        setAdminLogin((prev) => ({
                           ...prev,
                           email: e.target.value,
                         }))
@@ -160,15 +161,15 @@ export const Login = () => {
                         borderRight={"none"}
                         borderTop={"none"}
                         focusBorderColor="none"
-                        placeholder={"Your password"}
+                        placeholder={"Enter password"}
                         _placeholder={{ opacity: 1, color: "#a0a0a0" }}
                         _focus={{
                           bg: "whiteAlpha.300",
                           borderColor: "#FFB300",
                         }}
-                        value={logindata.password}
+                        value={adminlogin.password}
                         onChange={(e) =>
-                          setLoginData((prev) => ({
+                          setAdminLogin((prev) => ({
                             ...prev,
                             password: e.target.value,
                           }))
@@ -190,7 +191,6 @@ export const Login = () => {
                   <Stack spacing={10} pt={2}>
                     <Button
                       type="submit"
-                      isDisabled={submissiondisbled}
                       style={{
                         background:
                           "linear-gradient(to top left, #171616 100%, #363431 51%)",
@@ -205,28 +205,17 @@ export const Login = () => {
                         color: "#FFB300",
                       }}
                     >
-                      Login
+                      Admin Login
                     </Button>
                   </Stack>
                   <Stack pt={6}>
                     <Text align={"center"}>
-                      Not registered?{" "}
                       <Link
-                        to="/signup"
+                        to="/login"
                         color={"rgb(255,189,89)"}
                         fontWeight={"600"}
                       >
-                        Signup
-                      </Link>
-                    </Text>
-                    <Text align={"center"}>
-                      <Link
-                        to="/adminlogin"
-                        color={"rgb(255,189,89)"}
-                        fontWeight={"600"}
-                      >
-                        {" "}
-                        Admin Login <ArrowForwardIcon />{" "}
+                        Login <ArrowForwardIcon />{" "}
                       </Link>
                     </Text>
                   </Stack>

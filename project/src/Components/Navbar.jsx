@@ -7,7 +7,6 @@ import {
   Stack,
   Collapse,
   Icon,
-  Link,
   Popover,
   PopoverTrigger,
   PopoverContent,
@@ -20,16 +19,11 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
-  MenuItemOption,
-  MenuGroup,
-  MenuOptionGroup,
-  MenuDivider,
 } from "@chakra-ui/react";
-// import './Navbar.module.css'
 import { useState } from "react";
-import logo from "../Assets/GemGardenLogo2.png";
 import logo1 from "../Assets/GemGardenLogo3.png";
 import { FaSearch } from "react-icons/fa";
+import { Link } from "react-router-dom";
 import {
   HamburgerIcon,
   CloseIcon,
@@ -43,32 +37,24 @@ import { logout } from "../Redux/Authentication/action";
 export default function Navbar() {
   const { isOpen, onToggle } = useDisclosure();
   const navigate = useNavigate();
-  // const { isAuth,errMsg,token } = useSelector((s/tore) => store.authReducer)
   const token = localStorage.getItem("user-token") || "";
   const [show, setShow] = useState(false);
-
   const dispatch = useDispatch();
-  // const { token } = useSelector((store) => store.authReducer)
-
   const handleLogout = () => {
     dispatch(logout(token));
     localStorage.removeItem("user-token");
   };
-
   return (
     <Box position={"sticky"} top="0" zIndex={"overlay"}>
       <Flex
         cursor={"pointer"}
         backgroundColor={"#262425"}
-        //   bg={useColorModeValue('white', 'gray.800')}
         color={useColorModeValue("gray.600", "white")}
         minH={"80px"}
         py={{ base: 2 }}
         px={{ base: 4 }}
         borderBottom={1}
-        // borderStyle={'solid'}
         bgGradient="linear(to-l, #222220, #2A2829 , #25231F)"
-        // borderColor={useColorModeValue('gray.200', 'gray.900')}
         align={"center"}
       >
         <Flex
@@ -100,17 +86,8 @@ export default function Navbar() {
             w="70px"
             textAlign={useBreakpointValue({ base: "center", md: "left" })}
             fontFamily={"heading"}
-            //   color={useColorModeValue('gray.800', 'white')}
             color={"#FFFFFF"}
           />
-          {/* Logo
-            </Text> */}
-          {/* <Flex >
-            <Box>
-            <Image src={logo} w="100%" />
-            </Box>
-          </Flex>
-             */}
 
           <Flex display={{ base: "none", md: "flex" }} ml={10}>
             <DesktopNav />
@@ -124,7 +101,6 @@ export default function Navbar() {
               borderTop={"none"}
               focusBorderColor="none"
               placeholder={"Search Something here..."}
-              // bg={useColorModeValue('blackAlpha.100', 'whiteAlpha.100')}
               _placeholder={{ opacity: 1, color: "white" }}
               _focus={{
                 bg: "white",
@@ -169,61 +145,58 @@ export default function Navbar() {
           >
             Contact Us
           </Button>
-          {/* <Text
-            onClick={()=>navigate("/signup")}
-            _hover={{
-              color:"rgb(255,189,89)"
-            }}
-             textDecoration={"none"}
-             color={"#FFFFFF"}
-              as={'a'}
-              fontSize={'sm'}
-              fontWeight={500}
-              variant={'link'}
-              href={'#'}>
-              Account
-            </Text> */}
           <Menu>
             <MenuButton
               color={"white"}
               _hover={{
                 color: "rgb(255,189,89)",
               }}
-              // href={'#'}
-              // as={Button}
-              // rightIcon={<ChevronDownIcon />}
             >
               Account
             </MenuButton>
-            <MenuList>
-              <MenuItem
-                _hover={{
-                  color: "rgb(255,189,89)",
-                }}
-              >
-                Profile
-              </MenuItem>
-              {token ? (
-                ""
-              ) : (
+            {token ? (
+              <MenuList>
+                <Link to="/profile">
+                  <MenuItem
+                    _hover={{
+                      color: "rgb(255,189,89)",
+                    }}
+                  >
+                    Profile
+                  </MenuItem>
+                </Link>
                 <MenuItem
+                  onClick={handleLogout}
                   _hover={{
                     color: "rgb(255,189,89)",
                   }}
-                  onClick={() => navigate("/signup")}
                 >
-                  Signup
+                  Logout
                 </MenuItem>
-              )}
-              <MenuItem
-                onClick={handleLogout}
-                _hover={{
-                  color: "rgb(255,189,89)",
-                }}
-              >
-                Logout
-              </MenuItem>
-            </MenuList>
+              </MenuList>
+            ) : (
+              <MenuList>
+                <Link to="/login">
+                  <MenuItem
+                    _hover={{
+                      color: "rgb(255,189,89)",
+                    }}
+                  >
+                    Login
+                  </MenuItem>
+                </Link>
+
+                <Link to={"/signup"}>
+                  <MenuItem
+                    _hover={{
+                      color: "rgb(255,189,89)",
+                    }}
+                  >
+                    Signup
+                  </MenuItem>
+                </Link>
+              </MenuList>
+            )}
           </Menu>
 
           <Button
@@ -251,8 +224,6 @@ export default function Navbar() {
 }
 
 const DesktopNav = () => {
-  const linkColor = useColorModeValue("gray.600", "gray.200");
-  const linkHoverColor = useColorModeValue("gray.800", "white");
   const popoverContentBgColor = useColorModeValue("white", "gray.800");
 
   return (
@@ -262,15 +233,16 @@ const DesktopNav = () => {
           <Popover trigger={"hover"} placement={"bottom-start"}>
             <PopoverTrigger>
               <Link
+                style={{
+                  textDecoration: "none",
+                  color: "#FFFFFF",
+                }}
                 p={2}
-                href={navItem.href ?? "#"}
+                to={navItem.href ?? "#"}
                 fontSize={"sm"}
                 fontWeight={500}
-                // color={linkColor}
-                color={"#FFFFFF"}
                 _hover={{
                   textDecoration: "none",
-                  // color: linkHoverColor,
                   color: "rgb(255,189,89)",
                 }}
               >
@@ -304,16 +276,14 @@ const DesktopNav = () => {
 const DesktopSubNav = ({ label, href, subLabel }) => {
   return (
     <Link
-      href={href}
+      to={href}
       role={"group"}
       display={"block"}
       p={2}
-      borderRadius={"0px"}
-      // rounded={'md'}
       _hover={{ bg: useColorModeValue("pink.50", "gray.900") }}
     >
       <Stack direction={"row"} align={"center"}>
-        <Box borderRadius={"0px"}>
+        <Box>
           <Text
             fontSize={"md"}
             textAlign={"left"}
@@ -398,7 +368,7 @@ const MobileNavItem = ({ label, children, href }) => {
         >
           {children &&
             children.map((child) => (
-              <Link key={child.label} py={2} href={child.href}>
+              <Link key={child.label} py={2} to={child.href}>
                 {child.label}
               </Link>
             ))}
@@ -415,13 +385,9 @@ const NAV_ITEMS = [
     children: [
       {
         label: "Rings",
-        // subLabel: 'Trending Design to inspire you',
-        // href: '#',
       },
       {
         label: "Bracelets",
-        // subLabel: 'Up-and-coming Designers',
-        // href: '#',
       },
       {
         label: "Earrings",
@@ -432,41 +398,13 @@ const NAV_ITEMS = [
       {
         label: "Accessories",
       },
-      // {
-      //   label : "Men's Jewelry"
-      // }
     ],
   },
   {
     label: "Watches",
-    // children: [
-    //   {
-    //     label: 'Job Board',
-    //     subLabel: 'Find your dream design job',
-    //     href: '#',
-    //   },
-    //   {
-    //     label: 'Freelance Projects',
-    //     subLabel: 'An exclusive list for contract work',
-    //     href: '#',
-    //   },
-    // ],
   },
   {
     label: "Gifts",
     href: "/product",
   },
-  // {
-  //   label : 'Account',
-  //   children :[
-  //       {
-  //         label : "Login",
-  //         href : "/login"
-  //       },
-  //       {
-  //         label:"Logout",
-  //         href:"/logout"
-  //       }
-  //   ]
-  // }
 ];

@@ -1,51 +1,40 @@
 import React from "react";
 import { getProducts } from "../Redux/Products/action";
-
 import { useDispatch, useSelector } from "react-redux";
-// import { Dispatch } from "redux";
-import { Card } from "./PRODUCTS/Card";
-// import { Sidebarprod } from './PRODUCTS/Sidebarprod'
+import { Card } from "../Components/Card.jsx";
 import styled from "@emotion/styled";
-
 import { useSearchParams } from "react-router-dom";
-import { Sidebarfilter } from "./PRODUCTS/Sidebarprod";
+import { Sidebarfilter } from "../Components/Sidebarprod";
 import { Button } from "@chakra-ui/react";
+import Loading from "../Components/Loading";
 
 export const Product = () => {
   const arrivalData = useSelector((store) => store.productReducer.products);
   const DataPages = useSelector((store) => store.productReducer.totalpages);
-  // console.log(DataPages)
   const page = new Array(Math.ceil(DataPages / 10)).fill(0);
-  // console.log(page);
   const [pages, setPages] = React.useState(1);
-
   const [searchParams] = useSearchParams();
   let obj = {
     params: {
       material: searchParams.getAll("material"),
-      // type: searchParams.getAll("type"),
       _sort: "currentprice",
       _order: searchParams.get("order"),
     },
   };
   const dispatch = useDispatch();
-  // function handlePage(page:number){
-  //   // dispatch(getProducts(obj,page))
-  //   setPages(page)
-  // }  
   React.useEffect(() => {
-    // dispatch(getProducts())
     dispatch(getProducts(obj, pages));
   }, [searchParams, pages]);
   return (
     <DIV className="body">
-      {/* <Sidebarprod/> */}
       <Sidebarfilter />
       <div className="mainBody">
         <div className="productcards">
-          {arrivalData.map((ele, ind) => (
-            <Card key={ind} ele={ele} />
-          ))}
+          {arrivalData.length == 0 ? (
+            <Loading />
+          ) : (
+            arrivalData.map((ele, ind) => <Card key={ind} ele={ele} />)
+          )}
         </div>
         <div className="pagination">
           {page.map((ele, ind) => (
@@ -76,24 +65,20 @@ const DIV = styled.div`
     width: 20%;
     /* border-right: 1px solid black; */
     padding: 20px;
-    /* background-color: #262626; */
-    /* color: white; */
   }
   .mainBody {
     width: 80%;
   }
   .productcards {
-    /* background-color: #3e3b3b; */
-    /* color: white; */
     align-items: center;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-gap: 30px;
     padding: 12px;
     margin: auto;
+    min-height: 100vh;
   }
   .card {
-    /* border: 1px solid #e0e0e0; */
     padding: 10px;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
   }
@@ -113,7 +98,7 @@ const DIV = styled.div`
     padding: 12px;
   }
 
-  @media only screen and (min-width:250px) and (max-width:600) {
+  @media only screen and (min-width: 250px) and (max-width: 600) {
     .productcards {
       grid-template-columns: repeat(1, 1fr);
     }
@@ -139,28 +124,3 @@ const DIV = styled.div`
     }
   }
 `;
-
-// import { getData } from "../Redux/RecipeReducer/action";
-// import { RecipeCard } from "./RecipeCard";
-// import styled from "styled-components";
-
-// export const RecipeList = () => {
-
-//   return (
-//     <div>
-//       <DIV data-testid="recipe-list">
-//         {/* Map through the recipe using the recipe card here */}
-//         {recipe.map((ele) => (
-//           <RecipeCard key={ele.id} ele={ele} />
-//         ))}
-//       </DIV>
-//     </div>
-//   );
-// };
-
-// const DIV = styled.div`
-//   display: grid;
-//   grid-template-columns: auto auto auto;
-//   padding: 12px;
-//   grid-gap: 12px;
-// `;

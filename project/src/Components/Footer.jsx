@@ -1,6 +1,5 @@
 import {
   Box,
-  chakra,
   Container,
   Link,
   SimpleGrid,
@@ -12,8 +11,8 @@ import {
   useColorModeValue,
   Image,
   Flex,
+  Button,
 } from "@chakra-ui/react";
-import { ReactNode } from "react";
 import { FaInstagram, FaTwitter, FaYoutube, FaPinterest } from "react-icons/fa";
 import { BiMailSend } from "react-icons/bi";
 import logo from "../Assets/GemGardenLogo2.png";
@@ -40,7 +39,7 @@ const Logo = (props) => {
 
 const SocialButton = ({ children, label, href }) => {
   return (
-    <chakra.button
+    <Button
       bg={useColorModeValue("blackAlpha.100", "whiteAlpha.100")}
       rounded={"full"}
       w={8}
@@ -58,7 +57,7 @@ const SocialButton = ({ children, label, href }) => {
     >
       <VisuallyHidden>{label}</VisuallyHidden>
       {children}
-    </chakra.button>
+    </Button>
   );
 };
 
@@ -72,12 +71,7 @@ const ListHeader = ({ children }) => {
 
 export default function Footer() {
   return (
-    <Box
-      backgroundColor={"#262425"}
-      // bg={useColorModeValue('gray.50', 'gray.900')}
-      // color={useColorModeValue('gray.700', 'gray.200')}
-      color="#FFFFFF"
-    >
+    <Box backgroundColor={"#262425"} color="#FFFFFF">
       <Container as={Stack} maxW={"6xl"} py={10}>
         <SimpleGrid
           templateColumns={{ sm: "1fr 1fr", md: "2fr 1fr 1fr 2fr" }}
@@ -85,7 +79,6 @@ export default function Footer() {
         >
           <Stack spacing={6}>
             <Box>
-              {/* <Logo color={useColorModeValue('gray.700', 'white')} /> */}
               <Flex alignItems={"center"}>
                 <Text fontWeight={"600"} fontSize={"25px"}>
                   GEM GARDEN
@@ -123,7 +116,6 @@ export default function Footer() {
             <Link href={"#"}>Return</Link>
             <Link href={"#"}>Terms of use</Link>
             <Link href={"#"}>How to order?</Link>
-            {/* <Link href={'#'}>Testimonials</Link> */}
           </Stack>
           <Stack
             color={"#a0a0a0"}
@@ -132,7 +124,6 @@ export default function Footer() {
             lineHeight={"30px"}
             align={"flex-start"}
           >
-            {/* <ListHeader>Rings</ListHeader> */}
             <Link href={"#"}>Rings</Link>
             <Link href={"#"}>Bracelets</Link>
             <Link href={"#"}>Earring</Link>
@@ -159,7 +150,6 @@ export default function Footer() {
                 }}
               />
               <IconButton
-                //   bg={useColorModeValue('green.400', 'green.800')}
                 bg={"#FFBD59"}
                 color={useColorModeValue("white", "gray.800")}
                 _hover={{

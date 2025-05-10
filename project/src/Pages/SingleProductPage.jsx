@@ -1,304 +1,264 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
-// import { getSingleProducts } from "./PRODUCTS/action";
-import { getSingleProducts } from "../Redux/Products/action";
-// import { Dispatch } from "redux";
+import { Link, useParams } from "react-router-dom";
 import styled from "@emotion/styled";
-import { Button, Input, Select, useToast } from "@chakra-ui/react";
+import { Button, Heading, Input, Select, useToast } from "@chakra-ui/react";
+
 import { GiCardExchange } from "react-icons/gi";
 import { SiMaterialdesign } from "react-icons/si";
 import { AiFillSafetyCertificate } from "react-icons/ai";
 import { RiExchangeCnyFill } from "react-icons/ri";
 import { BiArchiveOut } from "react-icons/bi";
 import { FaShippingFast } from "react-icons/fa";
-import { ToastStatusExample } from "./PRODUCTS/alert";
 
+import { getSingleProducts } from "../Redux/Products/action";
 
-
-export const SingleProductPage = () => {
-  const[cart,setCart]=useState([])
-  const arrivalData = useSelector(
-    (store) => store.productReducer.singlePageData
-  );
-  const [imageData, setImage] = React.useState(arrivalData.src1);
+const SingleProductPage = () => {
+  const [selectedImage, setSelectedImage] = useState();
+  const [cart, setCart] = useState([]);
   const { id } = useParams();
   const dispatch = useDispatch();
-  React.useEffect(() => {
+  const toast = useToast();
+
+  const product = useSelector((store) => store.productReducer.singlePageData);
+
+  // Fetch product on mount
+  useEffect(() => {
     dispatch(getSingleProducts(id));
+  }, [dispatch, id]);
+
+  // Load cart from localStorage
+  useEffect(() => {
+    const cartData = JSON.parse(localStorage.getItem("gem_garden_cart")) || [];
+    setCart(cartData);
   }, []);
 
-const toast=useToast()
-useEffect(()=>{
-  let cartdata=JSON.parse(localStorage.getItem("gem_garden_cart"))||[]
-setCart((pre)=>[...cartdata])
-},[])
-const addToCart = () => {
-  console.log(cart);
-  if (checkDuplicate()) {
-
-
-    toast({
-      title: 'Cant add',
-      description: "Item already in cart",
-      status: 'warning',
-      duration: 2000,
-      isClosable: true,
-    })
-
-    console.log("Item already in cart");
-  } else {
-    setCart((prev) => [...prev, arrivalData]);
-    localStorage.setItem(
-      "gem_garden_cart",
-      JSON.stringify([...cart, {...arrivalData,quantity:1}])
-    );
-    toast({
-      title: 'Congratulations🥳',
-      description: "Product added to cart",
-      status: 'success',
-      duration: 2000,
-      isClosable: true,
-    })
-  }
-};
-
-
-  const checkDuplicate = () => {
-    console.log("running");
-    let isDuplicate = false;
-    cart.map((el) => {
-      console.log(el.id, arrivalData.id);
-      if (el.id === arrivalData.id) {
-        isDuplicate = true;
-      }
-    });
-    return isDuplicate;
+  // Add product to cart
+  const addToCart = () => {
+    if (isDuplicateInCart()) {
+      toast({
+        title: "Can't add",
+        description: "Item already in cart",
+        status: "warning",
+        duration: 2000,
+        isClosable: true,
+      });
+    } else {
+      const updatedCart = [...cart, { ...product, quantity: 1 }];
+      setCart(updatedCart);
+      localStorage.setItem("gem_garden_cart", JSON.stringify(updatedCart));
+      toast({
+        title: "Congratulations 🥳",
+        description: "Product added to cart",
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+      });
+    }
   };
-  
+
+  // Check for duplicate in cart
+  const isDuplicateInCart = () => {
+    return cart.some((item) => item.id === product.id);
+  };
+
+  const productImages = [product.src1, product.src2, product.src3];
+  const activeImage = selectedImage || product.src1;
 
   return (
-    <DIV>
-      <div>
-        <div className="topsectionImage">
-          <div className="imageDetail">
-            <div className="ImageContainer">
-              <img
-                className="mainImage"
-                src={imageData !== undefined ? imageData : arrivalData.src1}
-                alt="img"
-              />
-            </div>
-            <div className="imageSideShow">
-              <img
-                onClick={() => setImage(`${arrivalData.src1}`)}
-                src={arrivalData.src1}
-                alt="img"
-              />
-              <img
-                onClick={() => setImage(`${arrivalData.src2}`)}
-                src={arrivalData.src2}
-                alt="img"
-              />
-              <img
-                onClick={() => setImage(`${arrivalData.src3}`)}
-                src={arrivalData.src3}
-                alt="img"
-              />
-              {/* <img  src={arrivalData.video} alt="img" /> */}
-            </div>
-            <div className="certified">
-              <div>
-                <SiMaterialdesign />
-                <p style={{ fontSize: "0.8rem", color: "grey" }}>
-                  Best Designs
-                </p>
-              </div>
-              <div>
-                <AiFillSafetyCertificate />
-                <p style={{ fontSize: "0.8rem", color: "grey" }}>
-                  Certified Diamonds
-                </p>
-              </div>
-              <div>
-                <BiArchiveOut />
-                <p style={{ fontSize: "0.8rem", color: "grey" }}>
-                  Bis Hallmark
-                </p>
-              </div>
-              <div>
-                <FaShippingFast />
-                <p style={{ fontSize: "0.8rem", color: "grey" }}>
-                  Insured Shipping
-                </p>
-              </div>
-              <div>
-                <RiExchangeCnyFill />
-                <p style={{ fontSize: "0.8rem", color: "grey" }}>
-                  Lifetime Exchange
-                </p>
-              </div>
-              <div>
-                <GiCardExchange />
-                <p style={{ fontSize: "0.8rem", color: "grey" }}>
-                  Easy Exchange
-                </p>
-              </div>
-            </div>
+    <Wrapper>
+      <div style={{ display: "flex", padding: "1rem 1rem" }}>
+        <Link to="/product">
+          <Button colorScheme="yellow">{"< Back to Products"}</Button>
+        </Link>
+      </div>
+      <div className="product-container">
+        {/* Left Section - Images */}
+        <div className="image-section">
+          <div className="main-image">
+            <img src={activeImage} alt="Product" />
           </div>
-          <div className="productsDetail">
-            <h1>{arrivalData.name}</h1>
-            <p style={{ fontSize: "0.8rem", color: "grey" }}>
-              By PC Jeweller | Product Code: OOOLR00055DD-FSY4F12
-            </p>
-            <p style={{ fontSize: "0.8rem", color: "grey" }}> (1 Reviews)</p>
-            <p style={{ fontSize: "1rem", color: "grey" }}>
-              Category : {arrivalData.material}
-            </p>
-            <h1>
-              M.R.P : ₹ {arrivalData.currentprice}.00{" "}
-              <span
-                style={{
-                  color: "red",
-                  verticalAlign: "middle",
-                  textDecoration: "line-through",
-                }}
-              >
-                (M.R.P : ₹ {arrivalData.orignalprice}.00)
-              </span>
-            </h1>
-            <p style={{ fontSize: "0.8rem", color: "grey" }}>
-              (Inclusive of all taxes)
-            </p>
-            <div className="size">
-              {" "}
-              <span>Size:</span>
-              <Select w="20%">
-                <option value="">Select Size</option>
-                <option value="">01</option>
-                <option value="">02</option>
-                <option value="">03</option>
-              </Select>
-            </div>
+          <div className="thumbnail-images">
+            {productImages.map((src, i) => (
+              <img
+                key={i}
+                src={src}
+                alt={`thumbnail-${i}`}
+                onClick={() => setSelectedImage(src)}
+              />
+            ))}
+          </div>
+          <div className="features">
+            <Feature icon={<SiMaterialdesign />} label="Best Designs" />
+            <Feature
+              icon={<AiFillSafetyCertificate />}
+              label="Certified Diamonds"
+            />
+            <Feature icon={<BiArchiveOut />} label="BIS Hallmark" />
+            <Feature icon={<FaShippingFast />} label="Insured Shipping" />
+            <Feature icon={<RiExchangeCnyFill />} label="Lifetime Exchange" />
+            <Feature icon={<GiCardExchange />} label="Easy Exchange" />
+          </div>
+        </div>
 
-            <Button className='btn' onClick={addToCart} backgroundColor="#C7A550" color="white" margin="0px 12px">ADD TO CART</Button>
-            {/* <ToastStatusExample  /> */}
-            <Button
-              className="btn"
-              backgroundColor="#C7A550"
-              color="white"
-              margin="0px 12px"
-            >
-              BUY NOW
+        {/* Right Section - Details */}
+        <div className="details-section">
+          <Heading>{product.name}</Heading>
+          <p className="sub-info">
+            By PC Jeweller | Product Code: OOOLR00055DD-FSY4F12
+          </p>
+          <p className="sub-info">(1 Reviews)</p>
+          <p className="category">Category: {product.material}</p>
+          <Heading fontSize="1.2rem">
+            M.R.P: ₹{product.currentprice}.00{" "}
+            <span className="striked-price">₹{product.orignalprice}.00</span>
+          </Heading>
+          <p className="sub-info">(Inclusive of all taxes)</p>
+
+          <div className="size-select">
+            <strong>Size:</strong>
+            <Select w="120px" placeholder="Select Size">
+              <option value="01">01</option>
+              <option value="02">02</option>
+              <option value="03">03</option>
+            </Select>
+          </div>
+
+          <div className="action-buttons">
+            <Button colorScheme="yellow" onClick={addToCart}>
+              Add to Cart
             </Button>
+            <Button colorScheme="yellow">Buy Now</Button>
+          </div>
 
-            <div className="delivery">
-              <div>
-                <p style={{ fontSize: "1.3rem", color: "#3D3D3B" }}>
-                  Expected Shipping Date
-                </p>
-                <p style={{ fontSize: "1rem", color: "grey" }}>15/05/2023</p>
-              </div>
-              <div>
-                <p>Delivery Option</p>
-                <div className="pincode">
-                  <Input type="text" placeholder="Enter pincode" />
-                  <Button backgroundColor="#50C7C7">Check</Button>
-                </div>
+          <div className="delivery-info">
+            <div>
+              <p className="delivery-title">Expected Shipping Date</p>
+              <p className="sub-info">15/05/2023</p>
+            </div>
+            <div className="pincode-check">
+              <p>Delivery Option</p>
+              <div className="pincode-input">
+                <Input placeholder="Enter pincode" />
+                <Button colorScheme="cyan">Check</Button>
               </div>
             </div>
           </div>
         </div>
-        {/* <div></div> */}
       </div>
-      {/* <div></div>
-      <div></div> */}
-    </DIV>
+    </Wrapper>
   );
 };
 
-const DIV = styled.div`
-color: white;
+// Reusable Feature Icon component
+const Feature = ({ icon, label }) => (
+  <div className="feature">
+    {icon}
+    <p>{label}</p>
+  </div>
+);
 
-background-color: #171819;
-  .topsectionImage {
-    display: flex;
-    justify-content: space-between;
-  }
-  .ImageContainer {
-    display: flex;
-    justify-content: center;
-    padding: 20px;
-    align-items: center;
-  }
-  h1{
-    background-color: #171819;
-    font-weight: 600;
+// Styled components
+const Wrapper = styled.div`
+  padding: 2rem;
 
-  
-  }
-  .topsectionImage .imageDetail .mainImage {
-    width: 90%;
-  }
-  .btn:hover {
-    background-color: #50a7c7;
-  }
-  .topsectionImage .imageDetail {
+  .product-container {
     display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    width: 45%;
-    padding: 12px;
+    gap: 2rem;
+    flex-wrap: wrap;
   }
-  .topsectionImage .productsDetail {
-    width: 50%;
-    padding: 12px;
-    text-align: left;
+
+  .image-section {
+    flex: 1;
+    min-width: 300px;
   }
-  .topsectionImage .productsDetail p {
-    margin: 12px 0px;
+
+  .main-image img {
+    width: 100%;
+    border: 2px solid #ccc;
+    border-radius: 0.5rem;
   }
-  .imageSideShow {
-    /* border: 1px solid; */
+
+  .thumbnail-images {
     display: flex;
-    border-radius: 50px;
+    gap: 10px;
+    margin: 1rem 0;
     cursor: pointer;
-    justify-content: center;
-    background-color: #ffde5b2c;
-    gap: 20px;
-    padding: 20px;
-    align-items: center;
   }
-  .imageSideShow img {
-    width: 10%;
+
+  .thumbnail-images img {
+    width: 60px;
+    border: 1px solid #ccc;
+    border-radius: 0.3rem;
   }
-  /* .delivery{
-    align-items: center;
-    padding: 12px 0px;
-    display: flex;
-    justify-content: space-between;
-  } */
-  .size {
-    /* width: 20%; */
-    margin: 22px 0px;
-    display: flex;
-    gap: 20px;
-  }
-  .certified {
+
+  .features {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    grid-gap: 20px;
-    padding: 20px;
+    gap: 1rem;
+    margin-top: 1rem;
+    text-align: center;
   }
-  .certified div {
+
+  .feature {
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
     color: #c7a108;
+    font-size: 0.8rem;
   }
-  .pincode {
+
+  .details-section {
+    flex: 1;
+    min-width: 300px;
+    text-align: left;
+  }
+
+  .sub-info {
+    font-size: 0.8rem;
+    color: grey;
+    margin: 0.25rem 0;
+  }
+
+  .category {
+    font-size: 1rem;
+    margin: 0.5rem 0;
+  }
+
+  .striked-price {
+    color: red;
+    text-decoration: line-through;
+    font-weight: normal;
+    margin-left: 0.5rem;
+  }
+
+  .size-select {
+    margin: 1rem 0;
     display: flex;
-    gap: 20px;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .action-buttons {
+    margin: 1rem 0;
+    display: flex;
+    gap: 1rem;
+  }
+
+  .delivery-info {
+    margin-top: 2rem;
+  }
+
+  .delivery-title {
+    font-size: 1.2rem;
+    color: #3d3d3b;
+  }
+
+  .pincode-input {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
   }
 `;
+
+export default SingleProductPage;

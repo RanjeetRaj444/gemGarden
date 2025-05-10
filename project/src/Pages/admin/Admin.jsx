@@ -1,13 +1,16 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./Admin.module.css";
-import { addProduct, deleteProduct, getProducts, updateProducts } from "../Redux/Admin/api";
-//import AdminProductCards from "../Components/AdminProductCards";
+import {
+  addProduct,
+  deleteProduct,
+  getProducts,
+  updateProducts,
+} from "../../Redux/Admin/api";
 import { useSearchParams } from "react-router-dom";
-
 
 const initialState = {
   src1: "",
-  src2:"",
+  src2: "",
   currentprice: 0,
   orignalprice: 0,
   video: "",
@@ -18,13 +21,8 @@ const initialState = {
 };
 
 export const Admin = () => {
-  // const dispatch=useDispatch()
-  // const Products:IAdmin_Product[]=useSelector((store:Admin_Products_State)=>store.Admin_Products)
-  // console.log(Products,"products")
   const [allProducts, setAllProducts] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
-
-
   const initialMaterial = searchParams.getAll("material");
   const initialId = searchParams.get("id");
   const initialType = searchParams.getAll("type");
@@ -33,27 +31,9 @@ export const Admin = () => {
   const [material, setMaterial] = useState(initialMaterial || []);
   const [type, setType] = useState(initialType || []);
   const [id, setId] = useState(initialId || null);
-
-
-const[editId,setEditId]=useState(null)
-const [deleteId,setDeleteId]=useState(null)
-
-
-
-
-
-
-
-
+  const [editId, setEditId] = useState(null);
   const [editProduct, setEditProduct] = useState(initialState);
   const [newData, setNewData] = useState(initialState);
-
-
-
-
-  
-
-  
 
   const obj = {
     params: {
@@ -64,15 +44,12 @@ const [deleteId,setDeleteId]=useState(null)
       _order: searchParams.get("order"),
     },
   };
-;
   useEffect(() => {
     getProducts(obj).then((res) => {
       console.log(res);
       setAllProducts([...res]);
     });
   }, [searchParams]);
-
-
 
   useEffect(() => {
     let params = {
@@ -81,15 +58,10 @@ const [deleteId,setDeleteId]=useState(null)
       order: order,
     };
     if (id !== null) {
-      params.id = id; // Assign the value of "id" if it is not null
+      params.id = id;
     }
     setSearchParams(params);
   }, [id, material, order, type]);
-
-
-
-
-  ///Filtering part//////////////////////
   const handelMaterial = (e) => {
     const { value } = e.target;
     let newMaterial = [...material];
@@ -99,7 +71,6 @@ const [deleteId,setDeleteId]=useState(null)
       newMaterial.push(value);
     }
     setMaterial(newMaterial);
-  //  console.log(material);
   };
 
   const handelId = (e) => {
@@ -107,195 +78,61 @@ const [deleteId,setDeleteId]=useState(null)
     setId(value);
   };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   const handleChange = (e) => {
     const { value, name } = e.target;
-  
-    // Create a new object with updated values for both newData and editProduct
     const updatedData = { ...newData, [name]: value };
-
-
-    
-  
-    // Update both newData and editProduct with the updated object
     setNewData(updatedData);
     setEditProduct(updatedData);
-  
-   // console.log(updatedData);
   };
-
-  //console.log(editProduct,"editable") 
-  //console.log(newData,"newData")
-
-
-//ADD
-  // const handleSubmitPost = (e: React.FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-
-  //   addProduct(newData);
-  //   setAllProducts((pre) => [...pre, newData]);
-
-
-  // };
-
-
   const handleSubmitPost = (e) => {
     e.preventDefault();
-  
     if (editId) {
-      // If editId exists, it means we are updating an existing product
-      updateProducts(newData, editId).then(()=>{
+      updateProducts(newData, editId).then(() => {
         getProducts(obj).then((res) => {
-                 console.log(res);
-                 setAllProducts([...res]);
-              });
+          console.log(res);
+          setAllProducts([...res]);
+        });
       });
     } else {
-      // If editId is null, it means we are adding a new product
       addProduct(newData);
       setAllProducts((pre) => [...pre, newData]);
     }
   };
-  
-
-
-
-
-//edit product data settings
   const handleEdit = (productId) => {
-   // console.log(productId,"editing id")
-    const selectedProduct = allProducts.find((product) => product.id === productId);
+    const selectedProduct = allProducts.find(
+      (product) => product.id === productId
+    );
     if (selectedProduct) {
       const { id, ...filteredProduct } = selectedProduct;
-      setEditId(productId)
-    
-    //for editing the product only
-     // setEditProduct(filteredProduct);
-
+      setEditId(productId);
       setNewData(filteredProduct);
     }
   };
 
-
-
-
-  
-  
-
-
-
-const HandelProductChange = () => {
-  console.log("changinggggggggggggggggg");
-
-  updateProducts(editProduct, editId)
-
-  
-    // .then((res) => {
-    //   return getProducts(obj);
-    // })
-    // .then((res) => {
-    //   console.log(res);
-    //   setAllProducts([...res]);
-    // })
-    // .catch((error) => {
-    //   console.error("Error updating products:", error);
-    // });
-  }
-
-//deletFetching
-// const HandelProductChange=()=>{
-//   console.log("changinggggggggggggggggg")
-
-
-//   updateProducts(editProduct,editId).then((res)=>{
-//     getProducts(obj).then((res) => {
-//       console.log(res);
-//       setAllProducts([...res]);
-//     });
-//   })
-//   updateProducts(newData,editId)
-
-
-// }
-
-
-
-
-
-
-
-// const HandelProductChange = () => {
-//   console.log("changinggggggggggggggggg");
-
-//   updateProducts(newData, editId)
- 
-//       setAllProducts(prevProducts => {
-//         // Remove the old product with the matching editId
-//         const updatedProducts = prevProducts.filter(product => product.id !== editId);
-//         // Add the new data (newData) to the updated products array
-//         updatedProducts.push(newData);
-//         return updatedProducts;
-//       });
-
-// };
-
-
-
-//deletefetching
-const handelDelete = (id) => {
-  deleteProduct(id)
-    .then(() => {
-      getProducts(obj).then((res) => {
-       // console.log(res);
-        setAllProducts([...res]);
+  const HandelProductChange = () => {
+    console.log("changinggggggggggggggggg");
+    updateProducts(editProduct, editId);
+  };
+  const handelDelete = (id) => {
+    deleteProduct(id)
+      .then(() => {
+        getProducts(obj).then((res) => {
+          setAllProducts([...res]);
+        });
+        const newAllProducts = allProducts.filter(
+          (product) => product.id !== id
+        );
+        setAllProducts(newAllProducts);
+      })
+      .catch((error) => {
+        console.error("Failed to delete product:", error);
       });
-      const newAllProducts = allProducts.filter((product) => product.id !== id);
-      setAllProducts(newAllProducts);
-    })
-    .catch((error) => {
-      console.error("Failed to delete product:", error);
-    });
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  //console.log(allProducts)
+  };
   return (
     <div className={`${styles.admin}`}>
-<div className={`${styles.navbarAdmin}`}>
-<h1>Welcome to Admin Portal</h1>
-</div>
+      <div className={`${styles.navbarAdmin}`}>
+        <h1 className="admin-heading">Welcome to Admin Portal</h1>
+      </div>
 
       <div className={`${styles.AdminPageContainer}`}>
         <div className={`${styles.Sortbar}`}>
@@ -307,23 +144,7 @@ const handelDelete = (id) => {
               name="id"
               onChange={handelId}
             />
-
             <p> Sort By Material</p>
-
-            {/* <select name=" material" id=""  onChange={handelMaterial} >
-              <option value="">Material</option>
-              <option value="Diamond">Diamond</option>
-              <option value="Solitaire">Solitaire"</option>
-              <option value="Gold">Gold</option>
-              <option value="Silver">Silver</option>
-            </select>
-            <p>  Sort By Price</p>
-            <select name=" material" id=""   >
-              <option value="">Price</option>
-              <option value="asc">Low to High</option>
-              <option value="desc">High to Low</option>
-            </select> */}
-
             <div className={`${styles.Checkbox}`}>
               <input
                 type="checkbox"
@@ -401,9 +222,6 @@ const handelDelete = (id) => {
           </form>
         </div>
 
-
-
-
         <div className={`${styles.AdminProductsList}`}>
           {allProducts.map((el) => (
             <div key={el.id} className={`${styles.AdminProductCards}`}>
@@ -412,22 +230,28 @@ const handelDelete = (id) => {
               <p>{el.material}</p>
               <h2>{el.currentprice} Rs</h2>
               <div className={`${styles.Edit_deletebutton}`}>
-                <button className={`${styles.editbtn}`}   onClick={() =>handleEdit(el.id)}  >Edit</button>
-                <button className={`${styles.deletebtn}`} onClick={()=>handelDelete(el.id)}   >Delete</button>
+                <button
+                  className={`${styles.editbtn}`}
+                  onClick={() => handleEdit(el.id)}
+                >
+                  Edit
+                </button>
+                <button
+                  className={`${styles.deletebtn}`}
+                  onClick={() => handelDelete(el.id)}
+                >
+                  Delete
+                </button>
               </div>
             </div>
           ))}
         </div>
 
-
-
-
         <div className={`${styles.AddingSection}`}>
           <div className={`${styles.ProductAddingForm}`}>
             <p>Add new product</p>
-     
-            <form action="" onSubmit={handleSubmitPost}>
 
+            <form action="" onSubmit={handleSubmitPost}>
               <input
                 type="text"
                 placeholder="Product Name"
@@ -435,8 +259,12 @@ const handelDelete = (id) => {
                 defaultValue={newData.name}
                 onChange={handleChange}
               />
-              <select name="material" id="" defaultValue={newData.material}
-             onChange={handleChange}>
+              <select
+                name="material"
+                id=""
+                defaultValue={newData.material}
+                onChange={handleChange}
+              >
                 <option value="">Category</option>
                 <option value="Diamond">Diamond</option>
                 <option value="Solitaire">Solitaire</option>
@@ -508,11 +336,15 @@ const handelDelete = (id) => {
                 defaultValue={newData.video}
                 onChange={handleChange}
               />
-              <input type="text" placeholder="Alternate Image" defaultValue={newData.src2} />
-         <div className={`${styles.FormButtonDiv}`}>
-         <button type="submit" >Add</button>
-              <button onClick={HandelProductChange}>Edit </button>
-         </div>
+              <input
+                type="text"
+                placeholder="Alternate Image"
+                defaultValue={newData.src2}
+              />
+              <div className={`${styles.FormButtonDiv}`}>
+                <button type="submit">Add</button>
+                <button onClick={HandelProductChange}>Edit </button>
+              </div>
             </form>
           </div>
         </div>
