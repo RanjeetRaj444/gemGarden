@@ -128,7 +128,9 @@ const SingleProductPage = () => {
             <Button colorScheme="yellow" onClick={addToCart}>
               Add to Cart
             </Button>
-            <Button colorScheme="yellow">Buy Now</Button>
+            <Link to={"/payment"}>
+              <Button colorScheme="yellow">Buy Now</Button>
+            </Link>
           </div>
 
           <div className="delivery-info">
